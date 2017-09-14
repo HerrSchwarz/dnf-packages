@@ -1,0 +1,27 @@
+#!/usr/bin/zsh
+
+packages_file="./packages"
+
+
+if [[ ! -a ${packages_file} ]]; then
+  echo "packages file not found, is expected here: ${packages_file}"
+  exit 1
+fi
+
+
+#addPackage() {
+#  ag --silent "^${PACKAGE_NAME}$" ${packages_file}
+#  package_missing=$?
+#  if [[ ${package_missing} ]]; do
+#    echo ${PACKAGE_NAME} >> ${packages_file}
+#  done
+#}
+#
+#if [[ "$#" -gt 0 ]]; then 
+#  for PACKAGE_NAME in $@; do
+#    addPackage ${PACKAGE_NAME}
+#  done
+#fi
+
+
+sudo dnf -y install $(cat ${packages_file})
