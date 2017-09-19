@@ -1,4 +1,4 @@
-#!/usr/bin/zsh
+#!/bin/sh
 
 packages_file="./packages"
 
@@ -9,19 +9,39 @@ if [[ ! -a ${packages_file} ]]; then
 fi
 
 
-#addPackage() {
-#  ag --silent "^${PACKAGE_NAME}$" ${packages_file}
-#  package_missing=$?
-#  if [[ ${package_missing} ]]; do
-#    echo ${PACKAGE_NAME} >> ${packages_file}
-#  done
-#}
-#
-#if [[ "$#" -gt 0 ]]; then 
-#  for PACKAGE_NAME in $@; do
-#    addPackage ${PACKAGE_NAME}
-#  done
-#fi
+addPackage() {
+  PACKAGE_NAME=$1
+  echo ${PACKAGE_NAME} >> ${packages_file}
+  sort --dictionary-order --output packages packages
+}
+
+isPackageInRepos() {
+  PACKAGE_NAME=$1
+  exists=$(dnf list ${PACKAGE_NAME} --quiet | wc --lines | tr --delete ' ')
+  echo ${exists}
+}
+
+isPackagePresent() {
+  PACKAGE_NAME=$1
+  echo $(ag --silent "^${PACKAGE_NAME}$" ${packages_file} | wc --lines)
+}
+
+if [[ "$#" -gt 0 ]]; then 
+  for PACKAGE_NAME in $@; do
+    package_present=$(isPackagePresent ${PACKAGE_NAME})
+    if [[ "${package_present}" -eq 0 ]]; then
+      package_exists=$(isPackageInRepos ${PACKAGE_NAME})
+      if [[ "${package_exists}" -gt 0 ]]; then
+        echo "Adding package ${PACKAGE_NAME}"
+        addPackage ${PACKAGE_NAME}
+      else
+        echo "${PACKAGE_NAME} not found in configured repositories, skipping..."
+      fi
+    else
+      echo "${PACKAGE_NAME} found in package file, skipping..."
+    fi
+  done
+fi
 
 
-sudo dnf -y install $(cat ${packages_file})
+#sudo dnf -y install $(cat ${packages_file})
