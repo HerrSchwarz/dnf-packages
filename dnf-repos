@@ -1,0 +1,10 @@
+#!/usr/bin/zsh
+
+if [[ ! -a ./repos ]]; then
+	echo "repo file not found"
+	exit 1
+fi
+for repo in $(<./repos) 
+{
+	sudo dnf config-manager --add-repo ${repo}
+}
