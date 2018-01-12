@@ -26,6 +26,8 @@ isPackagePresent() {
   echo $(ag --silent "^${PACKAGE_NAME}$" ${packages_file} | wc --lines)
 }
 
+sudo dnf update
+
 if [[ "$#" -gt 0 ]]; then 
   for PACKAGE_NAME in $@; do
     package_present=$(isPackagePresent ${PACKAGE_NAME})
@@ -44,4 +46,4 @@ if [[ "$#" -gt 0 ]]; then
 fi
 
 
-#sudo dnf -y install $(cat ${packages_file})
+sudo dnf -y install $(cat ${packages_file})
